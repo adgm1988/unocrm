@@ -2,13 +2,25 @@
 @section('content')
 
 
-
-<button style="float:left;" type="button" class="btn btn-info btn-sm mb-2" data-toggle="modal" data-target="#modalactividad" id="open">Agregar</button>
-@if(auth::user()->admin ==1 || auth::user()->consultor ==1)
-    <a href="/actividades/export"><button style="float:left; margin-left:10px;" type="button" class="btn btn-info btn-sm" >Exportar</button></a>
-@endif
-<h3 class='text-center'>Agenda de actividades</h3>
-
+<div class="row">
+	<div class="col-md-2">
+		<button style="float:left;" type="button" class="btn btn-info btn-sm mb-2" data-toggle="modal" data-target="#modalactividad" id="open">Agregar</button>
+		@if(auth::user()->admin ==1 || auth::user()->consultor ==1)
+		    <a href="/actividades/export"><button style="float:left; margin-left:10px;" type="button" class="btn btn-info btn-sm" >Exportar</button></a>
+		@endif
+	</div>
+	<div class="col-md-3">
+		<select class="form-control" onchange="filtrar()" id="filtro">
+			<option value="0" default>Todos</option>
+			@foreach($vendedores as $vendedor)
+				<option value="{{$vendedor->id}}">{{$vendedor->name}}</option>
+			@endforeach
+		</select>
+	</div>
+	<div class="col-md-7">
+		<h3 class='text-left pl-5'>Agenda de actividades</h3>
+	</div>
+</div>
 
 @if ($errors->any())
     <div class="alert alert-danger">
@@ -25,7 +37,7 @@
 	@csrf
 
 	<!-- Modal agregar -->
-	<div class="modal" tabindex="-1" role="dialog" id="modalactividad">
+	<div class="modal" tabindex="-1col-md-12" role="dialog" id="modalactividad">
 		<div class="modal-dialog" role="document">
 			<div class="modal-content">
 				<div class="alert alert-danger" style="display:none"></div>
@@ -39,8 +51,6 @@
 				<div class="modal-body">
 					<div class="row">
 						<div class="form-group col-md-12">
-							
-
 							<label for="prospecto">Prospecto:</label>
 							<select class="custom-select" name="prospecto">
 								@foreach($prospectos as $prospecto)
@@ -169,12 +179,13 @@
 			</tr>
 		</thead>
 		@foreach($actividades as $actividad)
-		<tr>		
+		<tr class="actividad">		
 			<td nowrap>
 				<a href="/actividad/{{ $actividad->id }}/form"><i class="far fa-edit"></i></a>&nbsp;
 				@if(auth::user()->admin ==1 || auth::user()->consultor ==1)
 				<a onclick="return confirm('¿Estas seguro de querer eliminar esta actividad?')" href="actividades/delete/{{ $actividad->id }}"><i class="far fa-trash-alt"></i></a>
 				@endif
+				<span style="display:none" class="usuario_id">{{$actividad->edited_by}}</span>
 			</td>
 			<td>{{ $actividad->prospecto->empresa ?? ''}}</td>		
 			<td nowrap>{{ $actividad->tiposdeact->tipo }}</td>		
@@ -197,5 +208,36 @@
 		@endforeach
 	</table>
 </div>
+
+
+<script>
+
+	var filtrar = function(){
+		var valor = document.getElementById('filtro').value;
+		console.log(valor);
+
+
+
+		var actividades = document.getElementsByClassName('actividad');
+		for(var i=0; i<actividades.length; i++){
+			var vendedor_id = actividades[i].getElementsByClassName('usuario_id')[0].textContent;
+			console.log("entre"+vendedor_id);
+			var filtro = vendedor_id;
+
+			if(filtro.includes(valor)){
+				actividades[i].style.display='table-row';
+			}else{
+				actividades[i].style.display='none';
+			}
+		}
+
+	}
+
+
+
+
+</script>
+
+
 
 @endsection

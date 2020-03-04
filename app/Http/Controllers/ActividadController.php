@@ -7,6 +7,7 @@ use App\Actividad;
 use App\Tipoact;
 use App\Prospecto;
 use App\Bitacora;
+use App\User;
 use Illuminate\Support\Facades\Auth;
 
 use Carbon\Carbon;
@@ -31,7 +32,8 @@ class ActividadController extends Controller
             $prospectos = Prospecto::all();
         }
     	$tipos = Tipoact::all();
-    	return view('pages.actividades',compact('actividades','tipos','prospectos'));
+        $vendedores = User::all();
+    	return view('pages.actividades',compact('actividades','tipos','prospectos','vendedores'));
     }
 
     function store(Request $request){
